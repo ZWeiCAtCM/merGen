@@ -1,0 +1,10 @@
+name: mergen
+
+services:
+  app:
+    image: mergen-docker-image
+    container_name: mergen-docker-container
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/app
