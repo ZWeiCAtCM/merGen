@@ -1,0 +1,15 @@
+version: '3.9'
+
+name: mergen
+
+services:
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    image: mergen-server-image
+    container_name: mergen-server-container
+    volumes:
+      - ./server:/app
+    ports:
+      - "8000:8000"

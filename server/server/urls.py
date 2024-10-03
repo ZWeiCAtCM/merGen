@@ -16,7 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include
+from callsd import callsd_urls
+
+from callskybox import callskybox_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('pano-gen/', include(callskybox_urls, namespace='callskybox')),
+    path('sd-gen/', include(callsd_urls, namespace='callsd')),
 ]
