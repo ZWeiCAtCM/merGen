@@ -1,15 +1,118 @@
-version: '3.9'
-
 name: mergen
 
+# Stable diffusion service base
+x-base_service: &base_service
+    container_name: mergen-sd-webui-api-container
+    ports:
+      - "${SD_API_PORT}:${SD_API_PORT}"
+    hostname: ${SD_API_HOST}
+    volumes:
+      - &v1 ./sd-webui-api/data:/data
+      - &v2 ./sd-webui-api/output:/output
+    env_file:
+      - .env
+    stop_signal: SIGKILL
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+              - driver: nvidia
+                device_ids: ['0']
+                capabilities: [compute, utility]
+
 services:
+# Stable diffusion service
+  sd-webui-api: &automatic
+    <<: *base_service
+    build: ./sd-webui-api/services/AUTOMATIC1111
+    image: mergen-sd-webui-api-image
+    environment:
+      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+    networks:
+      - mergen-network
+  download:
+    build: ./sd-webui-api/services/download/
+    profiles: ["download"]
+    volumes:
+      - *v1
+# API gateway
   server:
     build: 
       context: ./server
       dockerfile: Dockerfile
     image: mergen-server-image
     container_name: mergen-server-container
+    env_file:
+      - .env
     volumes:
       - ./server:/app
     ports:
-      - "8000:8000"
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    networks:
+      - mergen-network
+# llama 3.2 service
+  llama-api:
+    build: 
+      context: ./llama_api
+      dockerfile: Dockerfile
+    image: mergen-llama-service
+    container_name: mergen-llama-container
+    env_file:
+      - .env
+    volumes:
+      - ./llama_api:/app
+    ports:
+      - "${LLAMA_API_PORT}:${LLAMA_API_PORT}"
+    hostname: ${LLAMA_API_HOST}
+
+# llama-stack-server
+  llama-stack-server:
+    image: llamastack/distribution-meta-reference-gpu  # 使用预构建的 Llama Stack Docker 镜像
+    volumes:
+      - ~/.llama:/root/.llama
+      - ./llama-stack/distributions/meta-reference-gpu/run.yaml:/root/my-run.yaml
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    ports:
+      - "${LLAMA_STACK_PORT}:${LLAMA_STACK_PORT}"
+    networks:
+      - mergen-network
+    runtime: nvidia
+    entrypoint: bash -c "python -m llama_stack.distribution.server.server --yaml_config /root/my-run.yaml"
+    deploy:
+      resources:
+          reservations:
+            devices:
+            - driver: nvidia
+              # that's the closest analogue to --gpus; provide
+              # an integer amount of devices or 'all'
+              count: 1
+              # Devices are reserved using a list of capabilities, making
+              # capabilities the only required field. A device MUST
+              # satisfy all the requested capabilities for a successful
+              # reservation.
+              capabilities: [gpu]
+# interior-design-assistant
+  interior-design-assistant:
+    build:
+      context: ./llama-stack-apps
+      dockerfile: Dockerfile
+    image: mergen-ida-service
+    container_name: mergen-ida-container
+    env_file:
+      - .env
+    environment:
+      - CUDA_VISIBLE_DEVICES=0  # 如果你使用 GPU
+    ports:
+      - "${IDA_API_PORT}:${IDA_API_PORT}"
+    networks:
+      - mergen-network
+    volumes:
+      - ./llama-stack-apps:/app  # 将本地目录挂载到容器
+    depends_on:
+      - llama-stack-server
+# network
+networks:
+  mergen-network:
+    driver: bridge

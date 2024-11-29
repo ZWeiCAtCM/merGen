@@ -1,5 +1,5 @@
 """
-URL configuration for server project.
+URL configuration for llama_api project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -16,17 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import include
-
-
-from skybox_gateway import skybox_gateway_urls
-from sd_gateway import sd_gateway_urls
-from mergen_core.core_views import get_csrf_token
+from llama_3b.llama_3b_views import generate_text_view
 
 urlpatterns = [
-    path("api/admin/", admin.site.urls),
-    path('api/pano-gen/', include(skybox_gateway_urls, namespace='skybox_gateway')),
-    path('api/sd-gen/', include(sd_gateway_urls, namespace='sd_gateway')),
-    # path('api/llama/', include(llama_ga, namespace='callsd')),
-    path('api/get-csrf-token/', get_csrf_token, name='get-csrf-token'),
+    path("admin/", admin.site.urls),
+    path('llama-3b/', generate_text_view, name='llama_generate')
 ]
