@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import base64
 import requests
 from pathlib import Path
@@ -15,7 +16,7 @@ SD_API_HOST = os.getenv("SD_API_HOST")
 SD_API_PORT = os.getenv("SD_API_PORT")
 
 URL = f"http://{SD_API_HOST}:{SD_API_PORT}"
-
+@csrf_exempt
 def txt2img_sd(request):
     if request.method == "POST":
         try:
@@ -52,7 +53,9 @@ def txt2img_sd(request):
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Only POST requests are allowed"}, status=405)
+@csrf_exempt
 def img2img_sd(request):
     return JsonResponse({"doodle": "sd-doodle"})
+@csrf_exempt
 def inpainting_from_sd(request):
     return JsonResponse({"inpainting": "sd-inpainting"})

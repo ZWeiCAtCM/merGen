@@ -25,6 +25,7 @@ services:
 # Stable diffusion service
   sd-webui-api: &automatic
     <<: *base_service
+    profiles: ["gateway_sd"]
     build: ./sd-webui-api/services/AUTOMATIC1111
     image: mergen-sd-webui-api-image
     environment:
@@ -38,6 +39,7 @@ services:
       - *v1
 # API gateway
   server:
+    profiles: ["gateway_sd"]
     build: 
       context: ./server
       dockerfile: Dockerfile
@@ -47,17 +49,18 @@ services:
       - .env
     volumes:
       - ./server:/app
+      - ../Frontend/Assets/Material:/app/Material 
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     networks:
       - mergen-network
 # llama 3.2 service
-  llama-api:
+  llama-3.2-1B-api:
     build: 
       context: ./llama_api
       dockerfile: Dockerfile
     image: mergen-llama-service
-    container_name: mergen-llama-container
+    container_name: mergen-llama-3.2-1B-container
     env_file:
       - .env
     volumes:
@@ -68,31 +71,34 @@ services:
 
 # llama-stack-server
   llama-stack-server:
-    image: llamastack/distribution-meta-reference-gpu  # 使用预构建的 Llama Stack Docker 镜像
-    volumes:
-      - ~/.llama:/root/.llama
-      - ./llama-stack/distributions/meta-reference-gpu/run.yaml:/root/my-run.yaml
-    environment:
-      - CUDA_VISIBLE_DEVICES=0
+    image: llamastack/distribution-together  # 使用 Together 版本的 Llama Stack
+    container_name: llama-stack-together-container
+    env_file:
+      - .env
     ports:
       - "${LLAMA_STACK_PORT}:${LLAMA_STACK_PORT}"
+    environment:
+      - LLAMA_STACK_PORT=${LLAMA_STACK_PORT}
+      - TOGETHER_API_KEY=${TOGETHER_API_KEY}  # 从 .env 读取 API Key
     networks:
       - mergen-network
-    runtime: nvidia
-    entrypoint: bash -c "python -m llama_stack.distribution.server.server --yaml_config /root/my-run.yaml"
-    deploy:
-      resources:
-          reservations:
-            devices:
-            - driver: nvidia
-              # that's the closest analogue to --gpus; provide
-              # an integer amount of devices or 'all'
-              count: 1
-              # Devices are reserved using a list of capabilities, making
-              # capabilities the only required field. A device MUST
-              # satisfy all the requested capabilities for a successful
-              # reservation.
-              capabilities: [gpu]
+    restart: always  # 让容器在崩溃时自动重启
+    # command: ["--port", "5001"]
+
+
+  ngrok:
+      image: ngrok/ngrok:latest
+      container_name: ngrok_tunnel
+      env_file:
+      - .env
+      command: ["http", "server:8000"]  # ✅ 把 `server` 服务暴露到公网
+      ports:
+        - "4040:4040"  # ✅ 访问 `ngrok` Web 界面，查看公网 URL
+      environment:
+        - NGROK_AUTHTOKEN=${NGROK_API_KEY}  # ✅ 你的 ngrok 认证 token（从 ngrok 官网获取）
+      networks:
+      - mergen-network
+
 # interior-design-assistant
   interior-design-assistant:
     build:
