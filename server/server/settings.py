@@ -41,6 +41,8 @@ CSRF_COOKIE_SECURE = False
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # ✅ 添加 Daphne 作为 WebSocket 服务器
+    
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,8 +53,17 @@ INSTALLED_APPS = [
     'mergen_core',
     "skybox_gateway",
     "sd_gateway",
-    "llama_gateway"
+    "llama_gateway",
+    "channels",
 ]
+
+ASGI_APPLICATION = "server.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # ✅ 用内存存储 WebSocket 连接
+    }
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -88,6 +99,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "server.wsgi.application"
+
 
 
 # Database

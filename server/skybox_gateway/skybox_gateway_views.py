@@ -6,6 +6,11 @@ import time
 import json
 from dotenv import load_dotenv
 import os
+import asyncio
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+UNITY_WEBSOCKET_GROUP = "unity_updates"
 
 # 加载 .env 变量
 load_dotenv()
@@ -92,35 +97,60 @@ def generate_skybox_with_image(request):
 def skybox_webhook(request):
     if request.method == "POST":
         try:
+            # 解析 JSON 数据
             data = json.loads(request.body)
-            file_url = data.get("file_url")
+            status = data.get("status", "")
+            file_url = data.get("file_url", "")
 
-            if not file_url:
-                return JsonResponse({"error": "No file URL received"}, status=400)
+            # ✅ 处理 Skybox 生成过程中的状态更新
+            if status in ["dispatched", "processing"]:
+                print(f"🔄 Skybox 生成状态: {status}, 等待完成...")
+                return JsonResponse({"message": f"Status updated: {status}"}, status=202)
 
-            # **✅ 1️⃣ 先把 `new.jpg` 备份成 `old.jpg`**
-            new_image_path = os.path.join(UNITY_ASSETS_PATH, "new.jpg")
-            old_image_path = os.path.join(UNITY_ASSETS_PATH, "old.jpg")
+            # ✅ 只有在 status = "complete" 时才处理图片
+            if status == "complete":
+                if not file_url:
+                    return JsonResponse({"error": "No file URL received"}, status=400)
 
-            if os.path.exists(new_image_path):  # 如果 `new.jpg` 存在
-                if os.path.exists(old_image_path):  # 如果 `old.jpg` 已经存在，先删除
-                    os.remove(old_image_path)
-                os.rename(new_image_path, old_image_path)  # 现在 `old.jpg` 是上一张 `new.jpg`
+                # **✅ 备份 `new.jpg` 到 `old.jpg`**
+                unity_assets_path = "/app/Material"
+                new_image_path = os.path.join(unity_assets_path, "new.jpg")
+                old_image_path = os.path.join(unity_assets_path, "old.jpg")
 
-            # **✅ 2️⃣ 下载新生成的 Skybox 并保存为 `new.jpg`**
-            response = requests.get(file_url)
-            if response.status_code == 200:
-                with open(new_image_path, "wb") as file:
-                    file.write(response.content)
+                if os.path.exists(new_image_path):
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                    os.rename(new_image_path, old_image_path)
 
-                return JsonResponse({"message": "Skybox updated successfully"}, status=200)
-            else:
-                return JsonResponse({"error": "Failed to download new skybox"}, status=500)
+                # **✅ 下载新生成的 Skybox 并保存为 `new.jpg`**
+                response = requests.get(file_url)
+                if response.status_code == 200:
+                    with open(new_image_path, "wb") as file:
+                        file.write(response.content)
+
+                    # **✅ 发送 WebSocket 通知给 Unity**
+                    channel_layer = get_channel_layer()
+                    async_to_sync(channel_layer.group_send)(
+                        UNITY_WEBSOCKET_GROUP,
+                        {
+                            "type": "send_update",
+                            "message": "Skybox updated"
+                        }
+                    )
+
+                    print("✅ Skybox 更新完成，通知 Unity")
+                    return JsonResponse({"message": "Skybox updated successfully"}, status=200)
+                else:
+                    return JsonResponse({"error": "Failed to download new skybox"}, status=500)
+
+            # 🚨 如果 `status` 不是 "dispatched", "processing", "complete" 之外的其他情况
+            return JsonResponse({"error": f"Unexpected status: {status}"}, status=400)
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 @csrf_exempt
 def generate_from_skybox(request):
