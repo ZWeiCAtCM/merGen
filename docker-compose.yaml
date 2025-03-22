@@ -1,42 +1,42 @@
 name: mergen
 
-# Stable diffusion service base
-x-base_service: &base_service
-    container_name: mergen-sd-webui-api-container
-    ports:
-      - "${SD_API_PORT}:${SD_API_PORT}"
-    hostname: ${SD_API_HOST}
-    volumes:
-      - &v1 ./sd-webui-api/data:/data
-      - &v2 ./sd-webui-api/output:/output
-    env_file:
-      - .env
-    stop_signal: SIGKILL
-    tty: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-              - driver: nvidia
-                device_ids: ['0']
-                capabilities: [compute, utility]
+# # Stable diffusion service base
+# x-base_service: &base_service
+#     container_name: mergen-sd-webui-api-container
+#     ports:
+#       - "${SD_API_PORT}:${SD_API_PORT}"
+#     hostname: ${SD_API_HOST}
+#     volumes:
+#       - &v1 ./sd-webui-api/data:/data
+#       - &v2 ./sd-webui-api/output:/output
+#     env_file:
+#       - .env
+#     stop_signal: SIGKILL
+#     tty: true
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#               - driver: nvidia
+#                 device_ids: ['0']
+#                 capabilities: [compute, utility]
 
 services:
-# Stable diffusion service
-  sd-webui-api: &automatic
-    <<: *base_service
-    profiles: ["gateway_sd"]
-    build: ./sd-webui-api/services/AUTOMATIC1111
-    image: mergen-sd-webui-api-image
-    environment:
-      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
-    networks:
-      - mergen-network
-  download:
-    build: ./sd-webui-api/services/download/
-    profiles: ["download"]
-    volumes:
-      - *v1
+# # Stable diffusion service
+#   sd-webui-api: &automatic
+#     <<: *base_service
+#     profiles: ["gateway_sd"]
+#     build: ./sd-webui-api/services/AUTOMATIC1111
+#     image: mergen-sd-webui-api-image
+#     environment:
+#       - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+#     networks:
+#       - mergen-network
+#   download:
+#     build: ./sd-webui-api/services/download/
+#     profiles: ["download"]
+#     volumes:
+#       - *v1
 # API gateway
   server:
     profiles: ["gateway_sd"]
@@ -54,20 +54,6 @@ services:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     networks:
       - mergen-network
-# llama 3.2 service
-  llama-3.2-1B-api:
-    build: 
-      context: ./llama_api
-      dockerfile: Dockerfile
-    image: mergen-llama-service
-    container_name: mergen-llama-3.2-1B-container
-    env_file:
-      - .env
-    volumes:
-      - ./llama_api:/app
-    ports:
-      - "${LLAMA_API_PORT}:${LLAMA_API_PORT}"
-    hostname: ${LLAMA_API_HOST}
 
 # llama-stack-server
   llama-stack-server:
@@ -100,24 +86,21 @@ services:
       - mergen-network
 
 # interior-design-assistant
-  interior-design-assistant:
+  ida-llama-agent:
     build:
-      context: ./llama-stack-apps
+      context: ./ida-llama-agent
       dockerfile: Dockerfile
-    image: mergen-ida-service
-    container_name: mergen-ida-container
+    image: mergen-ida-llama-agent
+    container_name: mergen-ida-llama-agent-container
     env_file:
       - .env
-    environment:
-      - CUDA_VISIBLE_DEVICES=0  # 如果你使用 GPU
     ports:
-      - "${IDA_API_PORT}:${IDA_API_PORT}"
+      - "${IDA_AGENT_PORT}:${IDA_AGENT_PORT}"
     networks:
       - mergen-network
-    volumes:
-      - ./llama-stack-apps:/app  # 将本地目录挂载到容器
     depends_on:
       - llama-stack-server
+
 # network
 networks:
   mergen-network:
