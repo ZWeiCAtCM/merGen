@@ -66,6 +66,7 @@ async def chat_view(request):
     
     # 构造消息内容
     content = []
+    content.append({"type": "text", "text": "Please answer in no more than 4 sentences."})
     if image_file:
         suffix = os.path.splitext(image_file.name)[1]
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:

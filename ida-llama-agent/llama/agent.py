@@ -21,8 +21,8 @@ from llama_stack_client.types import QueryConfig
 from llama_stack_client.types.agent_create_params import AgentConfig
 
 from termcolor import cprint
-
-MODEL = "meta-llama/Llama-3.2-11B-Vision-Instruct"
+import os
+MODEL = os.getenv("TOGETHER_LLAMA_MODEL")
 
 
 class InterioAgent:

@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/admin/", admin.site.urls),
     path('api/pano-gen/', include(skybox_gateway_urls, namespace='skybox_gateway')),
     path('api/sd-gen/', include(sd_gateway_urls, namespace='sd_gateway')),
+    path('api/llama_gateway/', include('llama_gateway.llama_gateway_urls')),
     # path('api/llama/', include(llama_ga, namespace='callsd')),
     path('api/get-csrf-token/', get_csrf_token, name='get-csrf-token'),
 ]

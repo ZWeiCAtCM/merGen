@@ -1,45 +1,10 @@
+# docker-compose.yaml
+
 name: mergen
 
-# # Stable diffusion service base
-# x-base_service: &base_service
-#     container_name: mergen-sd-webui-api-container
-#     ports:
-#       - "${SD_API_PORT}:${SD_API_PORT}"
-#     hostname: ${SD_API_HOST}
-#     volumes:
-#       - &v1 ./sd-webui-api/data:/data
-#       - &v2 ./sd-webui-api/output:/output
-#     env_file:
-#       - .env
-#     stop_signal: SIGKILL
-#     tty: true
-#     deploy:
-#       resources:
-#         reservations:
-#           devices:
-#               - driver: nvidia
-#                 device_ids: ['0']
-#                 capabilities: [compute, utility]
-
 services:
-# # Stable diffusion service
-#   sd-webui-api: &automatic
-#     <<: *base_service
-#     profiles: ["gateway_sd"]
-#     build: ./sd-webui-api/services/AUTOMATIC1111
-#     image: mergen-sd-webui-api-image
-#     environment:
-#       - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
-#     networks:
-#       - mergen-network
-#   download:
-#     build: ./sd-webui-api/services/download/
-#     profiles: ["download"]
-#     volumes:
-#       - *v1
 # API gateway
   server:
-    profiles: ["gateway_sd"]
     build: 
       context: ./server
       dockerfile: Dockerfile

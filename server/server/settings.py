@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,7 +29,8 @@ SECRET_KEY = "django-insecure--e)^**u$8)%p$e+lq5f1pqy-g9)i!ekq75ha-o804y_3nen-6$
 DEBUG = True
 
 load_dotenv()
-ALLOWED_HOSTS = [".ngrok-free.app", "localhost","127.0.0.1"]
+# ALLOWED_HOSTS = [".ngrok-free.app", "localhost","127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',  # 你的前端 React 应用的地址
@@ -41,8 +43,6 @@ CSRF_COOKIE_SECURE = False
 # Application definition
 
 INSTALLED_APPS = [
-    "daphne",  # ✅ 添加 Daphne 作为 WebSocket 服务器
-    
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -74,6 +74,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    'server.middleware.DisableCSRFMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
