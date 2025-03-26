@@ -1,8 +1,8 @@
-sd-webui-api
-llama-stack-server-Azure
-llama-stack-apps
-llama-stack
-llama-api
+sd-webui-api/
+llama-stack-server-Azure/
+llama-stack-apps/
+llama-stack/
+llama-api/
 
 
 # Byte-compiled / optimized / DLL files
