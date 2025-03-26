@@ -7,9 +7,25 @@
 import base64
 import mimetypes
 import uuid
-
+# from PIL import Image
 
 # TODO: This should move into a common util as will be needed by all apps
+
+# def data_url_from_compressed_image(file_path, quality=50, desired_width=1000, desired_height=500):
+#     # 打开图片并进行压缩和可选缩放
+#     with Image.open(file_path) as img:
+#         if desired_width and desired_height:
+#             img = img.resize((desired_width, desired_height))
+#         buffer = io.BytesIO()
+#         img.save(buffer, format="JPEG", quality=quality)
+#         image_bytes = buffer.getvalue()
+    
+#     # 使用 mimetypes 猜测 MIME 类型，但这里强制输出为 JPEG 类型
+#     mime_type = "image/jpeg"
+#     encoded_string = base64.b64encode(image_bytes).decode("utf-8")
+#     data_url = f"data:{mime_type};base64,{encoded_string}"
+#     return data_url
+
 def data_url_from_image(file_path):
     mime_type, _ = mimetypes.guess_type(file_path)
     if mime_type is None:

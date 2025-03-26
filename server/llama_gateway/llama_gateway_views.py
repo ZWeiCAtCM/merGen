@@ -36,7 +36,6 @@ async def chat_proxy(request):
     content, status_code = await proxy_request("/api/chat/", request)
     print("Response content:", content)
     response = JsonResponse(content, status=status_code, safe=False)
-    print("Response type:", type(response))
     return response
 
 async def list_items_proxy(request):

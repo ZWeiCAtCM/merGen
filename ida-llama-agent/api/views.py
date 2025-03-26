@@ -78,9 +78,11 @@ async def chat_view(request):
         finally:
             os.remove(tmp_path)
         content.append({"type": "image", "image": {"url": {"uri": data_url}}})
+        print("Using image:", tmp_path)
     
     if user_message:
         content.append({"type": "text", "text": user_message})
+        print("Using prompt:", user_message)
     
     # 获取 agent 实例和全局会话
     agent = await get_agent()
