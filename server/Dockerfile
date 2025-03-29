@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM python:3.9-alpine
+FROM python:3.9-slim
 
 ENV PYTONDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -15,4 +15,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD ["sh", "-c", "gunicorn server.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:${GATEWAY_PORT}"]
-

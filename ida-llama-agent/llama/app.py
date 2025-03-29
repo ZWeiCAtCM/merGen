@@ -19,10 +19,10 @@ API = None
 # LLAMA_STACK_HOST = os.getenv("LLAMA_STACK_HOST", "localhost")
 LLAMA_STACK_HOST = "localhost"
 LLAMA_STACK_PORT = int(os.getenv("LLAMA_STACK_PORT", 5000))
-IDA_API_PORT = int(os.getenv("IDA_API_PORT", 8003))
-print('PORT is:')
+IDA_AGENT_PORT = int(os.getenv("IDA_AGENT_PORT", 8001))
+print('LLAMA_STACK_PORT is:')
 print(LLAMA_STACK_PORT)
-print('HOST is:')
+print('LLAMA_STACK_HOST is:')
 print(LLAMA_STACK_HOST)
 PATH = "examples/interior_design_assistant/resources/documents"
 IMG_DIR = "examples/interior_design_assistant/resources/images/fireplaces"
@@ -130,4 +130,4 @@ with gr.Blocks() as demo:
     )
 
 initialize()
-demo.launch(server_name="0.0.0.0", server_port=IDA_API_PORT)
+demo.launch(server_name="0.0.0.0", server_port=IDA_AGENT_PORT)

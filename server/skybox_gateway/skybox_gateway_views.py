@@ -41,8 +41,8 @@ else:
     WEBHOOK_URL = None
 
 # Blockade Labs API Key
-BLOCKADE_API_KEY = os.getenv("BLOCKADE_LABS_API_KEY")
-BLOCKADE_API_URL = os.getenv("BLOCKADE_LABS_ENDPOINT")
+BLOCKADE_LABS_API_KEY = os.getenv("BLOCKADE_LABS_API_KEY")
+BLOCKADE_LABS_ENDPOINT = os.getenv("BLOCKADE_LABS_ENDPOINT")
 UNITY_ASSETS_PATH = "/app/Material"
 
 @csrf_exempt
@@ -53,14 +53,17 @@ def generate_skybox_with_image(request):
             try:
                 data = json.loads(request.body)
             except json.JSONDecodeError:
+                print("Invalid JSON format")
                 return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
             prompt = data.get("prompt", "A beautiful futuristic bedroom")  # 默认 prompt
-            skybox_style_id = 35  # 你想要使用的 Skybox 风格 ID
+            version = data.get("version", "current")  # 默认 current.jpeg
+            skybox_style_id = 147  # 你想要使用的 Skybox 风格 ID
 
             # 读取 `new.jpg` 并转为 Base64
-            new_image_path = os.path.join(UNITY_ASSETS_PATH, "new.jpg")
+            new_image_path = os.path.join(UNITY_ASSETS_PATH, version + ".jpg")
             if not os.path.exists(new_image_path):
+                print(f"{new_image_path} not found inside Docker")
                 return JsonResponse({"error": f"{new_image_path} not found inside Docker"}, status=400)
             
             with open(new_image_path, "rb") as img_file:
@@ -74,14 +77,13 @@ def generate_skybox_with_image(request):
                 "control_model": "remix",
                 "webhook_url": WEBHOOK_URL  # Blockade Labs 生成完成后回调
             }
-            headers = {"x-api-key": BLOCKADE_API_KEY, "Content-Type": "application/json"}
+            headers = {"x-api-key": BLOCKADE_LABS_API_KEY, "Content-Type": "application/json"}
             print("🔹 Sending request to Skybox AI with prompt:", prompt)
             print("🔹 Skybox AI will send request to this WEBHOOK_URL upon finish:", WEBHOOK_URL)
-            response = requests.post(BLOCKADE_API_URL, json=payload, headers=headers)
+            response = requests.post(BLOCKADE_LABS_ENDPOINT, json=payload, headers=headers)
 
             # ✅ 添加 debug 日志
             print("🔹 API Response Status:", response.status_code)
-            print("🔹 API Key:", BLOCKADE_API_KEY)
             print("🔹 API Response Text:", response.text)  # 确保 API 实际返回了 JSON
             try:
                 return JsonResponse(response.json(), safe=False)  # 解析 JSON
@@ -112,17 +114,17 @@ def skybox_webhook(request):
                 if not file_url:
                     return JsonResponse({"error": "No file URL received"}, status=400)
 
-                # **✅ 备份 `new.jpg` 到 `old.jpg`**
+                # **✅ 备份 `current.jpg` 到 `previous.jpg`**
                 unity_assets_path = "/app/Material"
-                new_image_path = os.path.join(unity_assets_path, "new.jpg")
-                old_image_path = os.path.join(unity_assets_path, "old.jpg")
+                new_image_path = os.path.join(unity_assets_path, "current.jpg")
+                old_image_path = os.path.join(unity_assets_path, "previous.jpg")
 
                 if os.path.exists(new_image_path):
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
                     os.rename(new_image_path, old_image_path)
 
-                # **✅ 下载新生成的 Skybox 并保存为 `new.jpg`**
+                # **✅ 下载新生成的 Skybox 并保存为 `current.jpg`**
                 response = requests.get(file_url)
                 if response.status_code == 200:
                     with open(new_image_path, "wb") as file:

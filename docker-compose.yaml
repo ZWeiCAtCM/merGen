@@ -13,12 +13,13 @@ services:
     env_file:
       - .env
     volumes:
-      - ./server:/app
       - ../Frontend/Assets/Material:/app/Material 
     ports:
       - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     networks:
       - mergen-network
+    # tty: true
+    # stdin_open: true
 
 # llama-stack-server
   llama-stack-server:
