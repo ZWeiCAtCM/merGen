@@ -1,0 +1,3 @@
+STENSELE Bar table, anthracite/anthracite, 27 1/2x27 1/2 "
+<price>169.99</price>
+<uri>124.jpg</uri>

@@ -1,0 +1,3 @@
+SKANSNÄS Extendable table, brown beech/veneer, 59/80 3/4x35 3/8 "
+<price>699</price>
+<uri>051.jpg</uri>

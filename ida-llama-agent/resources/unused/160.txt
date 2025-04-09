@@ -1,0 +1,3 @@
+SKANSNÄS Chair, brown beech
+<price>125</price>
+<uri>160.jpg</uri>

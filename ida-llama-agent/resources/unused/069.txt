@@ -1,0 +1,3 @@
+RÖNNINGE Bar table, birch, 29 1/2x29 1/2 "
+<price>299.99</price>
+<uri>069.jpg</uri>

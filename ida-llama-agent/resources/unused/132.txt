@@ -1,0 +1,3 @@
+EKEDALEN / EKEDALEN Table and 6 chairs, dark brown/Orrsta light gray, 70 7/8/94 1/2 "
+<price>789.99</price>
+<uri>132.jpg</uri>

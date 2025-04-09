@@ -1,0 +1,3 @@
+DANDERYD Dining table, black, 51 1/8x31 1/2 "
+<price>149</price>
+<uri>021.jpg</uri>

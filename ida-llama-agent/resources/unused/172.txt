@@ -1,0 +1,3 @@
+SIGTRYGG Chair, dark brown/Sefast black
+<price>70</price>
+<uri>172.jpg</uri>

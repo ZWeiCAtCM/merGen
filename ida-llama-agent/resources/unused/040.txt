@@ -1,0 +1,3 @@
+NACKANÄS Table, acacia, 55 1/8x29 7/8 "
+<price>299.99</price>
+<uri>040.jpg</uri>

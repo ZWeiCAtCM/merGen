@@ -1,0 +1,3 @@
+LÄTT Children's table and 2 chairs, white/pine
+<price>49.99</price>
+<uri>057.jpg</uri>

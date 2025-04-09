@@ -1,0 +1,3 @@
+MARIEDAMM Table, black marble effect, 41 3/8 "
+<price>319.99</price>
+<uri>073.jpg</uri>

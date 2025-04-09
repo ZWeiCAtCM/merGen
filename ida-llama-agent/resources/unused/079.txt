@@ -1,0 +1,3 @@
+DOCKSTA Bar table, white/white, 40 1/2 "
+<price>279.99</price>
+<uri>079.jpg</uri>

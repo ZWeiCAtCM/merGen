@@ -1,0 +1,3 @@
+NORRMANSÖ Chair, outdoor, indoor/outdoor beige/acacia
+<price>65</price>
+<uri>166.jpg</uri>

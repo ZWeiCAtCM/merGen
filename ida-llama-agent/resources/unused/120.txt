@@ -1,0 +1,3 @@
+GRÅSALA / ÖSTANÖ Table and 2 chairs, gray/Remmarn deep green, 26 3/8 "
+<price>99.99</price>
+<uri>120.jpg</uri>

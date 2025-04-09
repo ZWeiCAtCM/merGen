@@ -1,0 +1,3 @@
+RESÖ Children's picnic table, light brown stained
+<price>44.99</price>
+<uri>083.jpg</uri>

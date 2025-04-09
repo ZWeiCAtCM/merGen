@@ -1,0 +1,3 @@
+GRÅSALA Table, gray/gray, 43 1/4x26 3/8x29 1/2 "
+<price>119.99</price>
+<uri>086.jpg</uri>

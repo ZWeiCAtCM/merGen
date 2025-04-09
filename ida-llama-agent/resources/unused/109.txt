@@ -1,0 +1,3 @@
+TÄRNÖ Chair, outdoor, foldable black/light brown stained
+<price>15</price>
+<uri>109.jpg</uri>

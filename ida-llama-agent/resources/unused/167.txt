@@ -1,0 +1,3 @@
+RÖNNINGE / RÖNNINGE Bar table and 2 bar stools, birch/birch
+<price>519.99</price>
+<uri>167.jpg</uri>

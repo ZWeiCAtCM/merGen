@@ -1,0 +1,3 @@
+RÖNNINGE Extendable table, birch, 46 1/2/68 1/8x30 3/4 "
+<price>239.99</price>
+<uri>075.jpg</uri>

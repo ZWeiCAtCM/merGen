@@ -1,0 +1,3 @@
+SKOGSBO Chair, dark brown
+<price>145</price>
+<uri>173.jpg</uri>

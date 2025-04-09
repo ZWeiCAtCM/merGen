@@ -1,0 +1,3 @@
+NORDVIKEN Chair, antique stain
+<price>65</price>
+<uri>164.jpg</uri>

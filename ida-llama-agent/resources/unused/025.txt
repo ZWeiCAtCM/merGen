@@ -1,0 +1,3 @@
+VOXLÖV Dining table, light bamboo, 70 7/8x35 3/8 "
+<price>399.99</price>
+<uri>025.jpg</uri>

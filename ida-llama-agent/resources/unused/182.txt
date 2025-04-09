@@ -1,0 +1,3 @@
+STOCKHOLM 2025 Chair, oak/leather
+<price>225</price>
+<uri>182.jpg</uri>

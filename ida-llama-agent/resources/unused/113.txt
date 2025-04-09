@@ -1,0 +1,3 @@
+LISABO / LISABO Table and 2 chairs, black/black, 34 5/8 "
+<price>329</price>
+<uri>113.jpg</uri>

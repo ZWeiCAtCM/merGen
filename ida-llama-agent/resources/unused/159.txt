@@ -1,0 +1,3 @@
+NACKANÄS / NACKANÄS Table and 6 chairs, acacia/acacia, 70 7/8 "
+<price>909.99</price>
+<uri>159.jpg</uri>

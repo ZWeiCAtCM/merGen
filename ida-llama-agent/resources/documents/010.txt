@@ -1,0 +1,8 @@
+Product details
+Its small dimensions make it especially suitable for small rooms or spaces.
+Material
+Solid pine, Stain, Clear acrylic lacquer
+Care
+Wipe clean using a damp cloth and a mild cleaner.
+<price>59.99</price>
+<uri>010.jpg</uri>

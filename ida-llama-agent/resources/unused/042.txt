@@ -1,0 +1,3 @@
+HÄGERNÄS Bar table and 4 bar stools, black stained pine
+<price>249.99</price>
+<uri>042.jpg</uri>

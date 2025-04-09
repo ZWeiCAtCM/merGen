@@ -1,0 +1,3 @@
+IKEA PS 2012 / JANINGE Table and 4 chairs, bamboo/white, 54 3/8 "
+<price>489.99</price>
+<uri>140.jpg</uri>

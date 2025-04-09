@@ -4,6 +4,7 @@
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
 
+import asyncio
 import base64
 import mimetypes
 import uuid
@@ -38,27 +39,40 @@ def data_url_from_image(file_path):
     return data_url
 
 
-def create_single_turn(client, agent_config, messages):
-    """Create a single turn agent session and return the response"""
-    response = client.agents.create(agent_config=agent_config)
-    agent_id = response.agent_id
 
-    response = client.agents.session.create(
-        agent_id=agent_id,
-        session_name=uuid.uuid4().hex,
-    )
-    session_id = response.session_id
+async def create_single_turn(client, agent_config, messages, retries=1, delay=0):
+    # for attempt in range(retries):
+    try:
+        response = client.agents.create(agent_config=agent_config)
+        agent_id = response.agent_id
+        await asyncio.sleep(delay)  # 等待，防止一下子超过速率
+        response = client.agents.session.create(
+            agent_id=agent_id,
+            session_name=uuid.uuid4().hex,
+        )
+        session_id = response.session_id
+        await asyncio.sleep(delay)  # 再等一下，防止一下子超过速率
+        generator = client.agents.turn.create(
+            agent_id=agent_id,
+            session_id=session_id,
+            messages=messages,
+            stream=True,
+        )
 
-    generator = client.agents.turn.create(
-        agent_id=agent_id,
-        session_id=session_id,
-        messages=messages,
-        stream=True,
-    )
+        for chunk in generator:
+            if chunk is None or chunk.event is None:
+                continue
+            payload = chunk.event.payload
+            if payload.event_type == "turn_complete":
+                await asyncio.sleep(delay)  # 等一下，节流
+                return payload.turn.output_message.content
 
-    for chunk in generator:
-        payload = chunk.event.payload
-        if payload.event_type == "turn_complete":
-            turn = payload.turn
-    print(type(turn))
-    return turn.output_message.content
+    except Exception as e:
+        if "429" in str(e) or "rate limit" in str(e).lower():
+            print(f"Rate limit hit. Retrying in {delay} seconds...")
+            await asyncio.sleep(delay)
+            delay *= 2
+        else:
+            raise
+    # raise RuntimeError("Exceeded retry attempts for single turn creation")
+

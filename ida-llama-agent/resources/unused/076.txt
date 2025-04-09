@@ -1,0 +1,3 @@
+KLIMPFJÄLL Dining table, gray-brown, 94 1/2x37 3/8 "
+<price>699</price>
+<uri>076.jpg</uri>

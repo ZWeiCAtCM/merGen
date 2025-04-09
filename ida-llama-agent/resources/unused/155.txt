@@ -1,0 +1,3 @@
+SANDSBERG Chair, black/brown stained
+<price>20</price>
+<uri>155.jpg</uri>

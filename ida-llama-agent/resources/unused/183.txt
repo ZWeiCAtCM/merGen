@@ -1,0 +1,3 @@
+STOCKHOLM 2025 Chair, dark brown
+<price>200</price>
+<uri>183.jpg</uri>

@@ -1,0 +1,3 @@
+EKEDALEN Extendable table, white, 70 7/8/94 1/2x35 3/8 "
+<price>429.99</price>
+<uri>071.jpg</uri>

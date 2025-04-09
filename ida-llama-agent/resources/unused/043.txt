@@ -1,0 +1,3 @@
+MÖRBYLÅNGA Table, oak veneer brown stained, 55x33 "
+<price>599</price>
+<uri>043.jpg</uri>

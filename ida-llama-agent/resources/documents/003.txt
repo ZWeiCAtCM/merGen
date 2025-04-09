@@ -1,0 +1,10 @@
+Material
+Solid pine, Adhesive
+Care
+Wipe clean using a damp cloth and a mild cleaner.
+
+Wipe dry with a clean cloth.
+
+Can be treated with oil, wax, lacquer or glazing paint for higher resistance and easy care.
+<price>74.99</price>
+<uri>003.jpg</uri>

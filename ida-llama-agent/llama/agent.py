@@ -106,17 +106,18 @@ class InterioAgent:
             session_id = session_response.session_id
 
         agent_config = AgentConfig(
-            enable_session_persistence=True,
+            enable_session_persistence=False,
             model=MODEL,
             instructions="",
             sampling_params={"strategy": {"type": "greedy"}},
             toolgroups=[
+                # Enable memory as a tool for RAG
                 {
                     "name": "builtin::rag",
                     "args": {
                         "vector_db_ids": [self.bank_id],
-                        "query": description,
-                        "query_config": {
+                        "query": description, 
+                        "query_config":  {
                             "max_chunks": 5,
                             "max_tokens_in_context": 4096,
                         },
@@ -124,24 +125,33 @@ class InterioAgent:
                 },
             ],
         )
+        
         prompt = textwrap.dedent(
             """
-            You have access to a RAG tool connected to a memory bank of images.
-            Your task is to call the RAG tool using the given description to retrieve the most relevant 4 images.
-            Do NOT generate the output yourself. You must call the tool to get real results.
-            Return results in the following format:
+            Your task is to retrieve relevant 3 matching images along with prices from memory bank using the RAG tool.
+            You will receive a query from the user.
+            Use the tool to perform the search.
+            Don't provide duplicated images.
+            Once you receive the tool result, don't repeatedly make another tool call, return 3 matching images to show their image paths and prices in the following example JSON array format.
+
+            Follow this JSON array example format exactly:
             [
                 {
-                    "image": "008.png",
-                },
+                    "image":"001.jpeg",
+                    "price":"$100"
+                }, 
                 {
-                    "image": "009.jpeg",
+                    "image":"009.jpeg",
+                    "price":"$120"
+                }, 
+                {
+                    "image":"006.jpeg",
+                    "price":"$160"
                 }
             ]
-            The uri value is enclosed in the tags <uri> and </uri>.
-
-            Return JSON as suggested, Do not return any other text or explanations.
-            Do not create uri values, return actual uri values you found in the bank.
+            image paths are enclosed in <uri> tags but dont include tags themselves.
+            prices are enclosed in <price> tags but dont include tags themselves.
+            Do not include explanations or extra characters.
             """
         )
         description_text = f"Description: {description}"
@@ -152,10 +162,12 @@ class InterioAgent:
                 {"type": "text", "text": description_text},
             ],
         }
-        response = create_single_turn(self.client, agent_config, [message])
+        response = await create_single_turn(self.client, agent_config, [message])
+        print("LLaMA raw response:", response)
         result = response.strip()
         print("Raw response:", result)
         return json.loads(result)
+
 
     # NOTE: If using a persistent memory bank, building on the fly is not needed
     # and LlamaStack apis can leverage existing banks

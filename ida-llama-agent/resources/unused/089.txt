@@ -1,0 +1,3 @@
+STENSELE Table, anthracite/anthracite, 27 3/8 "
+<price>169.99</price>
+<uri>089.jpg</uri>

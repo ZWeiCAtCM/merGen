@@ -1,0 +1,3 @@
+TÄRNÖ Bench, outdoor, foldable black/light brown stained
+<price>59.99</price>
+<uri>171.jpg</uri>

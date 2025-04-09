@@ -1,0 +1,3 @@
+RÖNNINGE / RÖNNINGE Table with 2 chairs and bench, birch/birch, 46 1/2/68 1/8 "
+<price>569.99</price>
+<uri>148.jpg</uri>

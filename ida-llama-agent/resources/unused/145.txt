@@ -1,0 +1,3 @@
+NORBERG / KÄTTIL Table and 2 chairs, white/Knisa light gray
+<price>229.99</price>
+<uri>145.jpg</uri>

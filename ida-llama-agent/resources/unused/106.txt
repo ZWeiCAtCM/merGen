@@ -1,0 +1,3 @@
+VOXLÖV / VOXLÖV Table and 4 chairs, bamboo/bamboo, 70 7/8x35 3/8 "
+<price>899.99</price>
+<uri>106.jpg</uri>

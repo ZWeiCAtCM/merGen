@@ -1,0 +1,3 @@
+TORSBY Table, chrome plated/high gloss white, 53 1/8x33 1/2 "
+<price>229.99</price>
+<uri>066.jpg</uri>
