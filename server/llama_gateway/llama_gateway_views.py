@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 IDA_AGENT_HOST = os.getenv("IDA_AGENT_HOST", "ida-llama-agent")
-IDA_AGENT_PORT = os.getenv("IDA_AGENT_PORT", "8003")
+IDA_AGENT_PORT = os.getenv("IDA_AGENT_PORT", "8001")
 IDA_AGENT_BASE_URL = f"http://{IDA_AGENT_HOST}:{IDA_AGENT_PORT}"
 
 async def proxy_request(endpoint, request):

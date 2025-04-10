@@ -23,7 +23,7 @@ services:
 
 # llama-stack-server
   llama-stack-server:
-    image: llamastack/distribution-together  # 使用 Together 版本的 Llama Stack
+    image: llamastack/distribution-together:0.1.7  # 使用 Together 版本的 Llama Stack
     container_name: llama-stack-together-container
     env_file:
       - .env
