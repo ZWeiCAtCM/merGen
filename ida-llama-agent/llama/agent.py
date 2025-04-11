@@ -132,25 +132,29 @@ class InterioAgent:
             You will receive a query from the user.
             Use the tool to perform the search.
             Don't provide duplicated images.
-            Once you receive the tool result, don't repeatedly make another tool call, return 3 matching images to show their image paths and prices in the following example JSON array format.
+            Once you receive the tool result, don't repeatedly make another tool call, return 3 matching images to show their image paths and prices and description in the following example JSON array format.
 
             Follow this JSON array example format exactly:
             [
                 {
                     "image":"001.jpeg",
-                    "price":"$100"
+                    "price":"$100",
+                    "description":"A beautiful table with a modern design."
                 }, 
                 {
                     "image":"009.jpeg",
-                    "price":"$120"
+                    "price":"$120",
+                    "description":"A stylish chair with a vintage look."
                 }, 
                 {
                     "image":"006.jpeg",
-                    "price":"$160"
+                    "price":"$160",
+                    "description":"A cozy sofa with a contemporary style."
                 }
             ]
             image paths are enclosed in <uri> tags but dont include tags themselves.
             prices are enclosed in <price> tags but dont include tags themselves.
+            descriptions are summaries based on the corresponding image document.
             Do not include explanations or extra characters.
             """
         )
