@@ -3,12 +3,22 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 import base64
 import time
+import random
+from datetime import datetime
 import json
 from dotenv import load_dotenv
 import os
 import asyncio
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from pathlib import Path
+
+# 设置日志目录（Docker 中的路径）
+LOG_IMAGE_DIR = Path("/app/logs")
+LOG_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+def get_timestamp_str():
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 UNITY_WEBSOCKET_GROUP = "unity_updates"
 
@@ -100,6 +110,52 @@ def generate_skybox_with_image(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 @csrf_exempt
+def take_me_there(request):
+    if request.method == "POST":
+        try:
+            # ✅ 解析 JSON 格式的请求
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                print("Invalid JSON format")
+                return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+            prompt = data.get("prompt", "Generate anything")  # 默认 prompt
+
+            skybox_ids = [
+                77, 121, 82, 112, 74, 81, 102, 85, 148, 153, 147, 87, 120, 83, 75,
+                146, 95, 122, 139, 150, 104, 149, 152, 143, 137, 145, 90, 89, 67, 119,
+                115, 123, 80, 151, 140, 88, 118, 93, 114, 73, 141, 68, 144, 138, 142
+            ]
+
+            skybox_style_id = random.choice(skybox_ids)
+            # skybox_style_id = 147  # 你想要使用的 Skybox 风格 ID
+
+            # 发送请求到 Blockade Labs API
+            payload = {
+                "skybox_style_id": skybox_style_id,
+                "prompt": prompt,
+                "webhook_url": WEBHOOK_URL  # Blockade Labs 生成完成后回调
+            }
+            headers = {"x-api-key": BLOCKADE_LABS_API_KEY, "Content-Type": "application/json"}
+            print("🔹 Sending request to Skybox AI with prompt:", prompt)
+            print("🔹 Skybox AI will send request to this WEBHOOK_URL upon finish:", WEBHOOK_URL)
+            response = requests.post(BLOCKADE_LABS_ENDPOINT, json=payload, headers=headers)
+
+            # ✅ 添加 debug 日志
+            print("🔹 API Response Status:", response.status_code)
+            print("🔹 API Response Text:", response.text)  # 确保 API 实际返回了 JSON
+            try:
+                return JsonResponse(response.json(), safe=False)  # 解析 JSON
+            except requests.exceptions.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON response from Blockade Labs API", "response_text": response.text}, status=500)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@csrf_exempt
 def skybox_webhook(request):
     if request.method == "POST":
         try:
@@ -115,6 +171,7 @@ def skybox_webhook(request):
 
             # ✅ 只有在 status = "complete" 时才处理图片
             if status == "complete":
+                print(f"✅ Skybox 生成状态: {status}, saving...")
                 if not file_url:
                     return JsonResponse({"error": "No file URL received"}, status=400)
 
@@ -134,6 +191,18 @@ def skybox_webhook(request):
                     with open(new_image_path, "wb") as file:
                         file.write(response.content)
 
+                    print("✅ Skybox 材质替换完成，archiving process in log")
+                    # ✅ 保存副本到 logs 文件夹
+                    try:
+                        timestamp = get_timestamp_str()
+                        backup_path = LOG_IMAGE_DIR / f"skybox_{timestamp}.jpg"
+                        with open(backup_path, "wb") as backup_file:
+                            backup_file.write(response.content)
+                    except Exception as e:
+                        print(f"✅ Error saving Skybox archiving process: {e}")
+
+
+                    print("✅ Skybox archiving process in log finished, sending info to Unity...")
                     # **✅ 发送 WebSocket 通知给 Unity**
                     channel_layer = get_channel_layer()
                     async_to_sync(channel_layer.group_send)(
@@ -235,6 +304,12 @@ def inpainting_from_segmind(request):
             if response.status_code == 200:
                 with open(new_image_path, "wb") as file:
                     file.write(response.content)
+                
+                # ✅ 保存副本到 logs 文件夹
+                timestamp = get_timestamp_str()
+                backup_path = LOG_IMAGE_DIR / f"segmind_{timestamp}.jpg"
+                with open(backup_path, "wb") as backup_file:
+                    backup_file.write(response.content)
 
                 # **✅ 发送 WebSocket 通知给 Unity**
                 channel_layer = get_channel_layer()
